@@ -3,8 +3,17 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OT Cyber Academy — From Rookie to Professional</title>
+<title>OTRise — OT Cybersecurity, From Rookie to Professional</title>
 <meta name="description" content="A free training game that takes you from plant-floor OT basics to professional-level industrial cybersecurity: Purdue model, protocols, IEC 62443, SIS, and real ICS incidents.">
+<link rel="canonical" href="https://otrise.io/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OTRise">
+<meta property="og:title" content="OTRise — OT Cybersecurity, From Rookie to Professional">
+<meta property="og:description" content="Six levels from plant-floor basics to incident command. Purdue model, IEC 62443, SIS, and real ICS incidents.">
+<meta property="og:url" content="https://otrise.io/">
+<meta name="twitter:card" content="summary">
+<meta name="theme-color" content="#0a0e14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%233ddc97'/%3E%3Ctext x='16' y='22' font-family='monospace' font-size='15' font-weight='700' text-anchor='middle' fill='%230a0e14'%3EOT%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
@@ -210,7 +219,7 @@
     <div class="brand">
       <div class="mark">OT</div>
       <div>
-        <div class="name">OT CYBER ACADEMY</div>
+        <div class="name">OTRISE</div>
         <div class="tag">PLANT-FLOOR ROOKIE → SECURITY PROFESSIONAL</div>
       </div>
     </div>
@@ -380,7 +389,7 @@ const state = {
   cur:{ level:0, idx:0, correct:0 }, answered:false, order:[0,1,2,3]
 };
 try {
-  const s = JSON.parse(localStorage.getItem('ot-academy-v2') || 'null');
+  const s = JSON.parse(localStorage.getItem('otrise-v1') || localStorage.getItem('ot-academy-v2') || 'null');
   if (s) {
     state.unlocked = Math.min(Math.max(s.unlocked || 1, 1), 6);
     if (Array.isArray(s.best) && s.best.length === 6) state.best = s.best;
@@ -390,7 +399,7 @@ try {
 } catch (e) {}
 function persist() {
   try {
-    localStorage.setItem('ot-academy-v2', JSON.stringify({
+    localStorage.setItem('otrise-v1', JSON.stringify({
       unlocked: state.unlocked, best: state.best, totalScore: state.totalScore
     }));
   } catch (e) {}
