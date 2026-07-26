@@ -14,4 +14,4 @@ Pushes to `main` are built and deployed automatically by AWS Amplify Hosting, wh
 
 ## Sources
 
-Advanced levels draw on IEC 62443, IEC 61511, NIST SP 800-82, and the cyber-physical risk framework of Sinclair Koelemij.
+Advanced levels draw on IEC 62443, IEC 61511, NIST SP 800-82, and the cyber-physical risk knowledge base.
