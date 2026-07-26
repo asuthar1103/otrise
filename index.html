@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OT Cyber Academy — From Rookie to Professional</title>
+<meta name="description" content="A free training game that takes you from plant-floor OT basics to professional-level industrial cybersecurity: Purdue model, protocols, IEC 62443, SIS, and real ICS incidents.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:#0a0e14; --panel:#0f1520; --panel2:#141d2b; --line:#1c2634; --line2:#2a3b52;
+    --text:#e6edf7; --dim:#77879c; --faint:#4d5c70; --body:#9fb0c6;
+    --green:#3ddc97; --amber:#f0b44c; --red:#e5604f; --sel:#31527a;
+    --mono:'JetBrains Mono',monospace;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { min-height:100%; }
+  body {
+    font-family:'Space Grotesk',system-ui,sans-serif;
+    background:
+      radial-gradient(900px 480px at 85% -8%, rgba(61,220,151,0.07), transparent 60%),
+      radial-gradient(700px 420px at 0% 110%, rgba(240,180,76,0.05), transparent 60%),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 48px),
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.014) 0 1px, transparent 1px 48px),
+      var(--bg);
+    color:var(--text);
+    display:flex; flex-direction:column; min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection { background:rgba(61,220,151,.25); }
+  a { color:var(--green); text-decoration:none; }
+  a:hover { color:#8cecc2; }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(12px); } to { opacity:1; transform:none; } }
+  button { font-family:inherit; }
+  button:focus-visible, [tabindex]:focus-visible { outline:2px solid var(--green); outline-offset:2px; }
+
+  header.top {
+    display:flex; align-items:center; justify-content:space-between; gap:20px;
+    padding:18px 44px; border-bottom:1px solid var(--line);
+  }
+  .brand { display:flex; align-items:center; gap:14px; }
+  .brand .mark {
+    width:36px; height:36px; border:1px solid var(--green); border-radius:8px;
+    display:grid; place-items:center; color:var(--green);
+    font-family:var(--mono); font-size:13px; font-weight:700;
+    box-shadow:0 0 18px rgba(61,220,151,0.18);
+  }
+  .brand .name { font-size:17px; font-weight:700; letter-spacing:3px; }
+  .brand .tag { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--dim); margin-top:2px; }
+  .hud { display:flex; gap:10px; font-family:var(--mono); font-size:12px; }
+  .hud .chip { border:1px solid var(--line); background:var(--panel); border-radius:8px; padding:8px 16px; color:var(--dim); white-space:nowrap; }
+  .hud .chip b.amber { color:var(--amber); }
+  .hud .chip b.green { color:var(--green); }
+
+  main { flex:1; width:100%; max-width:1160px; margin:0 auto; padding:36px 44px 56px; }
+  .screen { display:none; }
+  .screen.active { display:block; }
+
+  /* ---- Level map ---- */
+  .map-grid { display:grid; grid-template-columns:1fr 380px; gap:28px; align-items:start; animation:fadeUp .4s ease both; }
+  .kicker { font-family:var(--mono); font-size:11px; letter-spacing:2px; color:var(--dim); }
+  .ladder { display:flex; flex-direction:column; gap:10px; margin-top:14px; }
+  .lvl-row {
+    display:flex; align-items:center; gap:16px; padding:16px 18px;
+    background:var(--panel); border:1px solid var(--line); border-radius:12px;
+    cursor:pointer; transition:border-color .15s, background .15s;
+    width:100%; text-align:left; color:var(--text);
+  }
+  .lvl-row:not(.locked):hover { border-color:#3d5a7a; }
+  .lvl-row.sel { background:var(--panel2); border-color:var(--sel); }
+  .lvl-row.locked { opacity:0.45; cursor:default; }
+  .lvl-node {
+    width:34px; height:34px; border-radius:50%; flex-shrink:0;
+    display:grid; place-items:center; font-family:var(--mono); font-size:13px; font-weight:700;
+    color:var(--dim); border:1px solid var(--line2); background:transparent;
+  }
+  .lvl-row.sel .lvl-node { color:var(--green); border-color:var(--green); box-shadow:0 0 14px rgba(61,220,151,0.25); }
+  .lvl-row.cleared .lvl-node { color:#06281c; background:var(--green); border-color:var(--green); box-shadow:none; }
+  .lvl-meta { flex:1; min-width:0; }
+  .lvl-role { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--dim); }
+  .lvl-title { font-size:16px; font-weight:600; margin-top:3px; }
+  .lvl-best { font-family:var(--mono); font-size:12px; font-weight:600; color:var(--dim); flex-shrink:0; }
+  .lvl-row.cleared .lvl-best { color:var(--green); }
+  .lvl-row.locked .lvl-best { color:var(--faint); }
+  .pass-note { font-family:var(--mono); font-size:11px; color:var(--faint); line-height:1.7; margin-top:16px; }
+
+  .brief {
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:26px; position:sticky; top:24px;
+  }
+  .brief .num { font-family:var(--mono); font-size:46px; font-weight:700; color:var(--green); line-height:1; margin:16px 0 6px; }
+  .brief .title { font-size:24px; font-weight:700; margin:6px 0 10px; }
+  .brief p.desc { color:var(--body); font-size:14px; line-height:1.6; margin:0 0 20px; }
+  .brief .sub { font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--dim); margin-bottom:8px; }
+  .diff-bar { display:flex; gap:4px; margin-bottom:20px; }
+  .diff-bar span { flex:1; height:6px; border-radius:2px; background:var(--line); }
+  .stats { display:flex; gap:24px; margin-bottom:22px; }
+  .stats .val { font-family:var(--mono); font-size:15px; font-weight:600; }
+  .stats .val.amber { color:var(--amber); }
+  .locked-note {
+    border:1px dashed var(--line2); border-radius:10px; padding:14px 16px;
+    font-family:var(--mono); font-size:12px; color:var(--dim); line-height:1.6;
+  }
+  .btn-primary {
+    width:100%; border:none; border-radius:10px; padding:14px;
+    background:linear-gradient(180deg,#41e3a0,#27a877); color:#06281c;
+    font-family:var(--mono); font-size:13px; font-weight:700; letter-spacing:2px;
+    cursor:pointer; box-shadow:0 4px 18px rgba(61,220,151,0.25);
+  }
+  .btn-primary:hover { filter:brightness(1.08); }
+  .btn-primary:active { transform:translateY(1px); }
+
+  /* ---- Quiz ---- */
+  .quiz-wrap { max-width:780px; margin:0 auto; animation:fadeUp .35s ease both; }
+  .quiz-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; }
+  .quiz-head .title { font-size:21px; font-weight:700; margin-top:4px; }
+  .quiz-count { font-family:var(--mono); font-size:12px; color:var(--dim); }
+  .segments { display:flex; gap:6px; margin-top:16px; }
+  .segments span { flex:1; height:6px; border-radius:3px; background:var(--line); }
+  .segments span.done { background:var(--green); opacity:0.55; }
+  .segments span.cur { background:var(--sel); }
+  .segments span.cur.answered { background:var(--green); }
+  .qcard { background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:28px; margin-top:18px; }
+  .scenario-tag {
+    display:none; font-family:var(--mono); font-size:10px; letter-spacing:2px; color:var(--amber);
+    border:1px solid rgba(240,180,76,0.4); border-radius:4px; padding:4px 10px; margin-bottom:14px;
+  }
+  .scenario-tag.show { display:inline-block; }
+  .q-text { font-size:19px; line-height:1.55; font-weight:600; margin-bottom:20px; }
+  .opts { display:grid; gap:10px; }
+  .opt {
+    display:flex; align-items:center; gap:14px; text-align:left;
+    font-size:15px; line-height:1.5; color:var(--text);
+    background:var(--panel2); border:1px solid var(--line2); border-radius:10px;
+    padding:13px 16px; cursor:pointer; transition:border-color .12s, background .12s;
+  }
+  .opt:not([disabled]):hover { border-color:#3d5a7a; }
+  .opt .key {
+    width:26px; height:26px; flex-shrink:0; display:grid; place-items:center;
+    font-family:var(--mono); font-size:12px; font-weight:700; color:var(--dim);
+    border:1px solid var(--line2); border-radius:6px;
+  }
+  .opt span.txt { flex:1; }
+  .opt[disabled] { cursor:default; }
+  .opt.correct { border-color:var(--green); background:rgba(61,220,151,0.12); }
+  .opt.correct .key { border-color:var(--green); color:var(--green); }
+  .opt.wrong { border-color:var(--red); background:rgba(229,96,79,0.12); }
+  .opt.wrong .key { border-color:var(--red); color:var(--red); }
+  .opt.faded { color:#67788e; background:transparent; border-color:var(--line); }
+  .explain {
+    display:none; margin-top:18px; padding:16px 18px; border-radius:10px;
+    background:rgba(93,143,255,0.05); border:1px solid #1e2c40; animation:fadeUp .25s ease both;
+  }
+  .explain.show { display:block; }
+  .explain .verdict { font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:2px; margin-bottom:8px; }
+  .explain .verdict.ok { color:var(--green); }
+  .explain .verdict.bad { color:var(--red); }
+  .explain .why { color:#b7c5d8; font-size:14px; line-height:1.65; }
+  .quiz-nav { display:flex; justify-content:space-between; gap:12px; margin-top:18px; }
+  .btn-ghost {
+    border:1px solid var(--line2); background:transparent; color:var(--body);
+    border-radius:10px; padding:12px 22px; font-family:var(--mono); font-size:12px;
+    letter-spacing:1px; cursor:pointer; transition:border-color .12s, color .12s;
+  }
+  .btn-ghost:hover { border-color:#3d5a7a; color:var(--text); }
+  .btn-next {
+    display:none; border:none; border-radius:10px; padding:12px 28px;
+    background:linear-gradient(180deg,#41e3a0,#27a877); color:#06281c;
+    font-family:var(--mono); font-size:12px; font-weight:700; letter-spacing:2px;
+    cursor:pointer; box-shadow:0 4px 18px rgba(61,220,151,0.25);
+  }
+  .btn-next.show { display:inline-block; }
+  .btn-next:hover { filter:brightness(1.08); }
+  .btn-next:active { transform:translateY(1px); }
+
+  /* ---- Results ---- */
+  .result-wrap { max-width:620px; margin:36px auto 0; text-align:center; animation:fadeUp .4s ease both; }
+  .result-card { background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:44px 36px; }
+  .result-card .kicker { letter-spacing:3px; }
+  .res-score { font-family:var(--mono); font-size:62px; font-weight:700; line-height:1.1; margin:16px 0 6px; }
+  .res-score.pass { color:var(--green); }
+  .res-score.fail { color:var(--amber); }
+  .res-title { font-size:24px; font-weight:700; margin-bottom:10px; }
+  .res-msg { color:var(--body); font-size:14px; line-height:1.65; max-width:440px; margin:0 auto 22px; }
+  .badges { display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-bottom:26px; }
+  .badge {
+    font-family:var(--mono); font-size:11px; letter-spacing:1px; padding:6px 14px; border-radius:14px;
+    background:rgba(61,220,151,0.1); color:var(--green); border:1px solid rgba(61,220,151,0.35);
+  }
+  .res-actions { display:flex; gap:12px; justify-content:center; }
+  .res-actions .btn-next { display:inline-block; padding:13px 28px; }
+  .res-actions .btn-ghost { padding:13px 24px; }
+
+  footer.bottom {
+    text-align:center; padding:0 44px 28px;
+    font-family:var(--mono); font-size:10px; letter-spacing:1px; color:var(--faint); line-height:1.8;
+  }
+
+  @media (max-width: 900px) {
+    header.top { padding:16px 20px; flex-wrap:wrap; }
+    main { padding:24px 20px 48px; }
+    .map-grid { grid-template-columns:1fr; }
+    .brief { position:static; }
+  }
+</style>
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <div class="mark">OT</div>
+      <div>
+        <div class="name">OT CYBER ACADEMY</div>
+        <div class="tag">PLANT-FLOOR ROOKIE → SECURITY PROFESSIONAL</div>
+      </div>
+    </div>
+    <div class="hud">
+      <div class="chip">SCORE <b class="amber" id="totalScore">0</b></div>
+      <div class="chip">CLEARED <b class="green" id="clearedCount">0</b> / 6</div>
+    </div>
+  </header>
+
+  <main>
+    <!-- LEVEL MAP -->
+    <section class="screen active" id="mapScreen">
+      <div class="map-grid">
+        <div>
+          <div class="kicker">TRAINING LADDER — 6 LEVELS</div>
+          <div class="ladder" id="ladder"></div>
+          <div class="pass-note" id="passNote"></div>
+        </div>
+        <aside class="brief">
+          <div class="kicker">MISSION BRIEFING</div>
+          <div class="num" id="selNum">01</div>
+          <div class="kicker" id="selRole"></div>
+          <div class="title" id="selTitle"></div>
+          <p class="desc" id="selDesc"></p>
+          <div class="sub">DIFFICULTY</div>
+          <div class="diff-bar" id="selDiff"></div>
+          <div class="stats">
+            <div><div class="sub">BEST</div><div class="val amber" id="selBest">— / 8</div></div>
+            <div><div class="sub">BADGE</div><div class="val" id="selBadge"></div></div>
+          </div>
+          <div class="locked-note" id="lockedNote" style="display:none">LOCKED — clear the previous level to gain access.</div>
+          <button class="btn-primary" id="startBtn">START LEVEL ▸</button>
+        </aside>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="screen" id="quizScreen">
+      <div class="quiz-wrap">
+        <div class="quiz-head">
+          <div>
+            <div class="kicker" id="quizRole"></div>
+            <div class="title" id="quizTitle"></div>
+          </div>
+          <div class="quiz-count" id="quizCount"></div>
+        </div>
+        <div class="segments" id="segments"></div>
+        <div class="qcard">
+          <span class="scenario-tag" id="scenarioTag">SCENARIO</span>
+          <div class="q-text" id="qText"></div>
+          <div class="opts" id="optBox"></div>
+          <div class="explain" id="explainBox">
+            <div class="verdict" id="verdict"></div>
+            <div class="why" id="whyText"></div>
+          </div>
+        </div>
+        <div class="quiz-nav">
+          <button class="btn-ghost" id="quitBtn">EXIT LEVEL</button>
+          <button class="btn-next" id="nextBtn">NEXT ▸</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- RESULTS -->
+    <section class="screen" id="resultScreen">
+      <div class="result-wrap">
+        <div class="result-card">
+          <div class="kicker">LEVEL DEBRIEF</div>
+          <div class="res-score" id="resScore"></div>
+          <div class="res-title" id="resTitle"></div>
+          <p class="res-msg" id="resMsg"></p>
+          <div class="badges" id="badgeRow"></div>
+          <div class="res-actions">
+            <button class="btn-ghost" id="retryBtn">RETRY LEVEL</button>
+            <button class="btn-next show" id="backBtn">TRAINING LADDER</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="bottom">ADVANCED LEVELS DRAW ON IEC 62443 / IEC 61511, NIST SP 800-82, AND THE CYBER-PHYSICAL RISK FRAMEWORK OF SINCLAIR KOELEMIJ</footer>
+
+<script>
+'use strict';
+const PASS = 6;
+
+const LEVELS = [
+{ title:"First Day at the Plant", role:"Level 1 · Rookie", diff:1, badge:"OT Aware",
+  desc:"The absolute basics: what OT actually is and why it isn't just 'IT with hard hats'.",
+  questions:[
+    { q:"What does 'OT' stand for in industrial cybersecurity?", opts:["Operational Technology","Online Terminal","Output Transmission","Organizational Testing"], a:0, why:"OT — Operational Technology — is the hardware and software that monitors and controls physical processes: pumps, valves, motors, production lines." },
+    { q:"Which of these is a typical OT device?", opts:["A PLC controlling a pump","An office printer","A payroll server","A conference room webcam"], a:0, why:"A PLC (Programmable Logic Controller) is a rugged industrial computer that directly controls machinery. The others are classic IT equipment." },
+    { q:"What does an HMI let a plant operator do?", opts:["View and control the process from a screen","Send marketing emails","Design mechanical parts","Manage employee records"], a:0, why:"The Human-Machine Interface is the operator's window into the process — live values, alarms, and controls for the plant." },
+    { q:"SCADA stands for…", opts:["Supervisory Control And Data Acquisition","Secure Central Access Data Application","System Check And Device Alert","Standard Control And Diagnostic Array"], a:0, why:"SCADA systems supervise and collect data from processes spread over large areas — pipelines, power grids, water networks." },
+    { q:"In a typical office IT system, confidentiality comes first. What comes first in OT?", opts:["Safety and keeping the process running","Confidentiality, same as IT","Fast internet speed","Data storage capacity"], a:0, why:"In OT the priority flips: a leaked file is bad, but a compromised controller can stop production or physically hurt people. Safety and availability lead." },
+    { q:"Why can't OT systems simply install every update immediately like office laptops?", opts:["Updates can force downtime and must be tested against the process first","OT systems never need updates","Updates are illegal in factories","OT devices have unlimited storage for patches"], a:0, why:"Many plants run 24/7, and an untested patch can break control software. Patching in OT is planned around shutdown windows and vendor validation." },
+    { q:"A colleague says: \"Our plant network is air-gapped, so hackers can't reach it.\" What's the realistic view?", opts:["True air gaps are rare — vendor links, USBs and remote access usually create paths in","He's right, air gaps make plants unhackable","Air gaps only fail during storms","Hackers can only attack websites, not plants"], a:0, why:"Modern plants exchange data with business systems, vendors and remote engineers. Even 'isolated' networks are reachable via USB media and temporary connections — Stuxnet proved it." },
+    { q:"Why do attackers bother targeting industrial systems at all?", opts:["Disruption, extortion and sabotage of physical operations can be very valuable","Only to test their internet speed","OT systems store cat videos","They can't — OT has no value to attackers"], a:0, why:"Stopping a pipeline, factory or power grid creates enormous pressure — for ransom, politics or sabotage. Physical impact is exactly what makes OT a target." }
+  ]},
+{ title:"Threats on the Floor", role:"Level 2 · Operator", diff:2, badge:"Threat Spotter",
+  desc:"Everyday attack paths: USB sticks, phishing, remote access and bad habits.",
+  questions:[
+    { q:"You find a USB stick in the plant parking lot. What do you do?", opts:["Hand it to security/IT — never plug it into any plant machine","Plug it into the HMI to find the owner","Plug it into your work laptop 'just quickly'","Format it and keep it"], a:0, why:"Dropped USB sticks are a classic attack. Stuxnet entered its target via removable media. Unknown media never touches OT equipment." },
+    { q:"Which email is most likely phishing?", opts:["\"Urgent: your SCADA password expires in 1 hour — click here to keep access\"","A newsletter you subscribed to","A meeting invite from your known manager","A delivery note you were expecting from a known supplier"], a:0, why:"Urgency + credential link = phishing pattern. Attackers often steal IT credentials first, then pivot toward OT systems." },
+    { q:"Why are default passwords (admin/admin) on OT devices so dangerous?", opts:["They're published in manuals online — attackers try them first","They use too much memory","They slow the network down","They expire too quickly"], a:0, why:"Default credentials for PLCs, HMIs and routers are freely documented. Scanning tools try them automatically — changing them is step one of hardening." },
+    { q:"A vendor asks for permanent, always-on remote access to 'their' machine in your plant. Best practice?", opts:["Time-limited access via a controlled gateway with MFA, monitored and approved per session","Give them a permanent VPN with full network access","Share the operator's own password","Let them install their own 4G modem on the PLC"], a:0, why:"Remote access is one of the top OT attack vectors. It should be brokered, time-boxed, least-privilege and logged — never a standing open door." },
+    { q:"Ransomware hits the office (IT) network. Why can production still end up stopping?", opts:["Shared services and connections mean plants often halt as a precaution or dependency","Ransomware improves plant performance","It can't — IT and OT are always separate","Only printers are affected by ransomware"], a:0, why:"Colonial Pipeline 2021: the ransomware hit IT, but operations were shut down because of dependencies and uncertainty. IT incidents become OT incidents fast." },
+    { q:"Why is an accurate asset inventory considered the first step of any OT security program?", opts:["You can't protect, patch or monitor devices you don't know exist","Inventories are only needed for accounting","It makes the network faster","Auditors like long spreadsheets"], a:0, why:"Unknown PLCs, forgotten modems and undocumented links are where attackers live. Visibility comes before any control." },
+    { q:"During maintenance you notice an unlabelled cellular modem wired to a controller. What is this?", opts:["A possible rogue/shadow connection that bypasses all network defenses — report it","Normal — more connectivity is always good","A Wi-Fi booster for the break room","Something to ignore if the machine still runs"], a:0, why:"Undocumented modems create a direct path from the internet to the process, skipping every firewall. They must be verified, authorized or removed." },
+    { q:"A contractor wants to connect his personal laptop directly to the control network 'to save time'. You should…", opts:["Refuse — only approved, scanned, managed devices connect to OT","Allow it if he promises he has antivirus","Allow it outside office hours only","Allow it if the laptop looks new"], a:0, why:"Transient devices are a major infection path into OT. Plants use dedicated, hardened engineering machines and controlled file-transfer processes instead." }
+  ]},
+{ title:"Blueprints & Barriers", role:"Level 3 · Engineer", diff:3, badge:"Architect",
+  desc:"Network architecture: the Purdue model, zones, conduits, DMZs and segmentation.",
+  questions:[
+    { q:"In the Purdue reference model, what lives at Level 0?", opts:["Sensors and actuators touching the physical process","The corporate email server","The ERP system","Cloud analytics dashboards"], a:0, why:"Level 0 is the physical layer — instruments and final elements (valves, motors). Levels rise through control (1), supervision (2), operations (3) to enterprise (4/5)." },
+    { q:"What is the main purpose of the industrial DMZ (the 'Level 3.5' between IT and OT)?", opts:["Broker all data exchange so no direct connection exists between enterprise and control networks","Host the company website","Store operator lunch menus","Make the network diagram look bigger"], a:0, why:"The iDMZ terminates connections from both sides — historians, patch servers, jump hosts — so enterprise systems never talk straight to controllers." },
+    { q:"Why is a 'flat' network (everything on one segment) dangerous in a plant?", opts:["One compromised device can reach every controller directly","Cables lie flat on the floor","It uses too many IP addresses","Flat networks are slower by definition"], a:0, why:"Without segmentation there is nothing to stop lateral movement: infect one laptop, reach every PLC. Segmentation contains the blast radius." },
+    { q:"In IEC 62443 language, what are 'zones' and 'conduits'?", opts:["Groups of assets with shared security needs, and the controlled channels between them","Physical fences and corridors in the plant","Types of firewall hardware","Wi-Fi frequency bands"], a:0, why:"A zone groups assets with similar criticality; conduits are the defined, restricted communication paths between zones — each with its own security requirements." },
+    { q:"The enterprise wants live production data. The secure pattern is…", opts:["OT pushes data outward to a historian/broker in the DMZ; enterprise reads from there","Give every office PC direct read access to the PLCs","Email CSV files from the HMI every hour","Put the PLC on the internet with a strong password"], a:0, why:"Data flows outward through an intermediary; nothing from the enterprise side initiates connections into the control network." },
+    { q:"What is a data diode (unidirectional gateway) used for?", opts:["Physically guaranteeing data flows in one direction only, e.g. out of a critical network","Boosting Wi-Fi signal","Encrypting USB sticks","Cooling the server room"], a:0, why:"Hardware-enforced one-way flow lets you export monitoring data from critical zones (like safety systems) with no physical possibility of traffic coming back in." },
+    { q:"Which firewall rule is the most suspicious on an IT→OT boundary?", opts:["'Any' source allowed to reach the PLC subnet on all ports","DMZ historian allowed to receive data from Level 3","Jump host reachable from a named admin subnet with MFA","Time-sync (NTP) from a defined internal server"], a:0, why:"'Any/any' rules to controller networks defeat the entire purpose of the boundary. Rules should be specific: named sources, named destinations, named ports." },
+    { q:"Where should a vendor's remote engineering session terminate?", opts:["On a monitored jump host in the DMZ, which then connects onward under control","Directly on the safety controller","On the operator's personal phone","On any machine that's free"], a:0, why:"The jump host pattern gives one controlled, recorded, policy-enforced entry point — instead of tunnels landing anywhere in the control network." }
+  ]},
+{ title:"Speaking Machine", role:"Level 4 · Specialist", diff:4, badge:"Protocol Pro",
+  desc:"Industrial protocols and the attack surface: Modbus, DNP3, OPC UA, engineering workstations.",
+  questions:[
+    { q:"What is the core security weakness of classic Modbus TCP?", opts:["No authentication — any device that can reach the port can read and write","It only works on Fridays","It encrypts too strongly to monitor","It requires cloud connectivity"], a:0, why:"Modbus was designed decades before security mattered. If you can reach a Modbus device, you can typically write coils and registers — the network must provide the protection the protocol lacks." },
+    { q:"An attacker on the control network sends valid 'write' commands to a PLC using the normal protocol. Why is this hard to detect?", opts:["The traffic looks like legitimate commands — nothing is 'malformed'","PLCs automatically block all attackers","Writes are always encrypted","Firewalls read the attacker's mind"], a:0, why:"Living-off-the-land in OT: abuse of legitimate protocol functions. Detection needs context — who sends, from where, when, and does the command make process sense." },
+    { q:"What does OPC UA offer that classic OPC (DCOM-based) did not?", opts:["Built-in authentication, encryption and signing","Faster floppy disk support","Guaranteed air-gapping","Free hardware upgrades"], a:0, why:"OPC UA was designed with security in the protocol: certificates, encrypted sessions, user authentication. Classic OPC relied on notoriously fragile DCOM settings." },
+    { q:"Why is the engineering workstation (EWS) such a prized target?", opts:["It holds the tools and project files to legitimately reprogram controllers","It has the best graphics card","Operators store music on it","It is always offline"], a:0, why:"Own the EWS and you own the process logic: attackers download modified programs to PLCs with the vendor's own software — exactly how Stuxnet and Triton worked." },
+    { q:"DNP3 is widely used in power and water utilities. What does 'DNP3 Secure Authentication' add?", opts:["Verification that critical commands come from an authorized source","Color graphics on RTUs","Automatic ransom payments","Unlimited bandwidth"], a:0, why:"SAv5 adds challenge-response authentication for critical operations, addressing plain DNP3's total trust in whoever is on the wire." },
+    { q:"Why can an ordinary IT vulnerability scan be dangerous on a live control network?", opts:["Fragile embedded devices can hang or reboot when probed — stopping the process","Scans are boring","It voids the office coffee machine warranty","Scanning always requires internet"], a:0, why:"Legacy PLC/RTU network stacks were never built for unexpected packets. OT asset discovery prefers passive monitoring, with active queries used carefully in maintenance windows." },
+    { q:"How could an attacker change a controller's behavior without touching its logic program?", opts:["Replace or tamper with the device firmware","Repaint the cabinet","Rename the HMI shortcuts","Update the plant's wall clock"], a:0, why:"Firmware attacks sit below the application logic and survive logic re-downloads. Integrity verification and controlled update processes are the defense." },
+    { q:"Which detection approach fits OT networks best as a baseline?", opts:["Passive monitoring that learns normal traffic and flags new connections or commands","Weekly aggressive port scans of all PLCs","Installing antivirus directly on every 20-year-old controller","Blocking all traffic and hoping"], a:0, why:"OT traffic is highly repetitive, which makes anomaly detection powerful: a new master, a first-ever write, a config download at 3 AM all stand out — without touching fragile endpoints." }
+  ]},
+{ title:"Standards & Risk", role:"Level 5 · Professional", diff:5, badge:"Risk Professional",
+  desc:"IEC 62443, IEC 61511, safety systems, and how professionals actually reason about cyber-physical risk.",
+  questions:[
+    { q:"What is IEC 62443?", opts:["The international standard series for industrial automation and control system security","A Wi-Fi certification","A forklift driving license","An accounting regulation"], a:0, why:"IEC 62443 covers programs, processes, system requirements and component requirements for securing industrial automation — the reference framework for OT security." },
+    { q:"IEC 62443 defines Security Levels SL1–SL4. What does SL4 protect against?", opts:["Sophisticated attackers with extensive resources and motivation (state-level)","Rain damage","Accidental coffee spills only","Slow internet connections"], a:0, why:"The SLs scale with attacker capability: SL1 casual/accidental, SL2 simple intentional, SL3 sophisticated, SL4 sophisticated with extensive resources. Target SLs are chosen per zone based on risk." },
+    { q:"What is a Safety Instrumented System (SIS)?", opts:["An independent layer that automatically forces the process to a safe state when limits are breached","The plant's CCTV system","A backup email server","Software for HR safety training"], a:0, why:"The SIS is the last automated line of defense — independent sensors, logic solver and final elements that trip the process before an unsafe condition becomes an accident." },
+    { q:"A SIS is certified SIL 3. Does that mean it is resistant to cyber attack?", opts:["No — SIL measures reliability against random/accidental failures, not against intelligent attackers","Yes, SIL 3 includes hackers","Yes, if the cabinet is locked","SIL only applies to elevators"], a:0, why:"IEC 61511's SIL targets assume accidental failure modes. A deliberate attacker who reprograms the logic solver defeats the certification's assumptions — which is why 61511 now requires a security risk assessment for the SIS." },
+    { q:"Why do many OT practitioners argue the IT 'CIA triad' fits OT poorly, proposing instead to assess Controllability, Observability and Operability (COO)?", opts:["Because what matters is whether operators can still control, see, and run the process — not primarily data secrecy","Because confidentiality is illegal in factories","Because OT has no data at all","Because triads must always be renamed"], a:0, why:"In Sinclair Koelemij's framing, the risk-bearing object is the physical process: an attack matters when you lose the ability to control it, observe its true state, or keep operating. CIA describes information, COO describes the process. (CIA still applies to e.g. recipes and credentials.)" },
+    { q:"Mature OT security design assumes the perimeter will eventually fail. What is the key 'second layer' question to ask?", opts:["\"If an attacker is already inside, is the process still controllable, observable and bounded?\"","\"Who do we blame first?\"","\"Can we buy a second firewall of the same brand?\"","\"Should we turn off all alarms to reduce noise?\""], a:0, why:"Prevention (layer 1) will someday fail. Resilient design preserves operational integrity under degraded trust — bounded authority, sanity-checked commands, independent protection — so compromise doesn't instantly become catastrophe." },
+    { q:"There are few good statistics on OT attacks. How do professionals still quantify cyber-physical risk defensibly?", opts:["Estimate the probability their own defenses fail if attacked (PFA), and let consequence severity drive priority","Wait a few decades for enough incidents","Copy last year's IT risk register","Use gut feeling and a red/yellow/green sheet only"], a:0, why:"Koelemij's approach: you can't derive frequencies from scarce attack data, but you can analyze your own barriers — the conditional probability that defenses fail given an attack — and weigh scenarios by the physical consequence ('risk pressure'), aligning with existing safety-risk criteria." },
+    { q:"Where does NIST SP 800-82 fit in?", opts:["It's the (US) NIST guide to OT security — practical guidance complementing IEC 62443","It's a firewall product","It's an EU privacy law","It replaces the need for engineering"], a:0, why:"SP 800-82 ('Guide to Operational Technology Security') gives architecture, risk and control guidance for OT, widely used alongside IEC 62443 and sector regulations." }
+  ]},
+{ title:"Incident Command", role:"Level 6 · Expert", diff:6, badge:"OT Cyber Expert",
+  desc:"Real attacks and expert judgment: Stuxnet, Triton, Ukraine — and the calls you'd have to make.",
+  questions:[
+    { q:"What made Stuxnet (discovered 2010) a landmark in OT security?", opts:["It crossed an air gap and made PLCs physically destroy equipment while operators saw normal readings","It was the first email virus","It only defaced websites","It attacked smartphones"], a:0, why:"Stuxnet spread via USB and vendor laptops, injected code into Siemens S7 PLCs, spun centrifuges out of tolerance and replayed normal data to the operators — proof that malware can cause targeted physical destruction while blinding the control room." },
+    { q:"Why is Triton/TRISIS (2017, Saudi petrochemical plant) considered a red line even among ICS attacks?", opts:["It targeted the Safety Instrumented System itself — the layer that prevents explosions and loss of life","It stole cafeteria menus","It only affected printers","It was purely a phishing test"], a:0, why:"Triton reprogrammed Triconex safety controllers. Disabling the SIS while an attacker also holds the control system removes the last automated barrier between an upset and a catastrophe. The plant tripped safe — partly luck." },
+    { q:"In the 2015 Ukraine power grid attack, how were the breakers actually opened?", opts:["Attackers used the operators' own SCADA sessions/tools after months of quiet preparation","A lightning strike","A software bug with no attacker","Solar flares"], a:0, why:"After spear-phishing and long reconnaissance, attackers took over operator workstations and clicked the breakers open themselves — then wiped systems and jammed the call center. Legitimate functionality, hostile hands." },
+    { q:"What did Industroyer/CrashOverride (Ukraine, 2016) demonstrate that generic malware had not?", opts:["Malware speaking grid protocols (like IEC 60870-5-104/61850) natively to command substations directly","That antivirus stops all ICS attacks","That grids cannot be attacked twice","That only USB sticks matter"], a:0, why:"Industroyer contained protocol modules to issue breaker commands itself — no human at the HMI needed. Attack capability had been productized for the grid domain." },
+    { q:"Scenario: Ransomware detonates in your company's IT network. OT is 'probably' clean. As OT lead, your soundest immediate posture is…", opts:["Pre-planned segmentation/isolation of OT, heightened monitoring, and keep operating only what you can verify as trustworthy","Do nothing — OT is someone else's problem","Immediately connect OT to IT to 'help' IT recover","Pay the ransom from petty cash"], a:0, why:"Colonial Pipeline's lesson: uncertainty about OT integrity is itself an operational risk. Prepared isolation playbooks, out-of-band monitoring and verified-trust operation beat both panic shutdown and blind continuation.", scenario:true },
+    { q:"Scenario: During unexplained controller reboots, an engineer suggests bypassing the SIS 'to stop nuisance trips' while you investigate. Expert response?", opts:["Refuse — with possible compromise in play, weakening the independent protection layer is exactly the wrong move; investigate with the SIS armed","Agree — trips are annoying","Bypass it but only on night shift","Bypass it and also disable alarms for quiet"], a:0, why:"Triton logic: an attacker (or fault) plus a bypassed SIS equals no remaining barrier. Unexplained controller behavior is a potential safety-critical incident; the protection layer stays in, and any bypass must be visible, authorized and time-limited.", scenario:true },
+    { q:"Scenario: A vendor states their new device 'complies with IEC 62443-4-2 and the CRA, so your risk is covered.' The professional reading is…", opts:["Compliance is an input, not proof — resilience depends on how the device is deployed, connected and operated in *your* installation","Compliance means nothing can ever go wrong","Certificates replace the need for architecture","Buy two, so you're doubly compliant"], a:0, why:"A certified product in a flat network with shared passwords is still a soft target. Product security must be translated through deployment context, automation function and operational consequence — installation-level risk is yours to assess.", scenario:true },
+    { q:"Scenario: The board asks, 'Are we secure now?' after a big OT security investment. The most honest expert answer is…", opts:["\"We've reduced specific risks measurably; here's what an attacker would still have to defeat, what we'd detect, and how the process stays safe if they succeed\"","\"Yes, 100% secure, forever\"","\"No idea, but the auditors were happy\"","\"Security is done; we can disband the team\""], a:0, why:"Expert maturity is speaking in residual risk: which scenarios are now bounded, what detection and response cover, and how safety is preserved under compromise — not absolute promises no honest engineer can make.", scenario:true }
+  ]}
+];
+
+/* ---------- state + persistence ---------- */
+const state = {
+  screen:'map', selected:0, unlocked:1,
+  best:[null,null,null,null,null,null], totalScore:0,
+  cur:{ level:0, idx:0, correct:0 }, answered:false, order:[0,1,2,3]
+};
+try {
+  const s = JSON.parse(localStorage.getItem('ot-academy-v2') || 'null');
+  if (s) {
+    state.unlocked = Math.min(Math.max(s.unlocked || 1, 1), 6);
+    if (Array.isArray(s.best) && s.best.length === 6) state.best = s.best;
+    state.totalScore = s.totalScore || 0;
+    state.selected = Math.min(state.unlocked - 1, 5);
+  }
+} catch (e) {}
+function persist() {
+  try {
+    localStorage.setItem('ot-academy-v2', JSON.stringify({
+      unlocked: state.unlocked, best: state.best, totalScore: state.totalScore
+    }));
+  } catch (e) {}
+}
+
+const $ = id => document.getElementById(id);
+function show(name) {
+  state.screen = name;
+  ['mapScreen','quizScreen','resultScreen'].forEach(id => $(id).classList.remove('active'));
+  $(name === 'map' ? 'mapScreen' : name === 'quiz' ? 'quizScreen' : 'resultScreen').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+/* ---------- level map ---------- */
+function renderMap() {
+  const cleared = state.best.filter(b => b !== null && b >= PASS).length;
+  $('totalScore').textContent = state.totalScore;
+  $('clearedCount').textContent = cleared;
+  $('passNote').textContent = 'Clear ' + PASS + ' of 8 questions to unlock the next level. Wrong answers teach the most — every one is explained.';
+
+  const ladder = $('ladder');
+  ladder.innerHTML = '';
+  LEVELS.forEach((lv, i) => {
+    const locked = i + 1 > state.unlocked;
+    const isCleared = state.best[i] !== null && state.best[i] >= PASS;
+    const row = document.createElement('button');
+    row.type = 'button';
+    row.className = 'lvl-row' + (locked ? ' locked' : '') + (state.selected === i ? ' sel' : '') + (isCleared ? ' cleared' : '');
+    row.innerHTML =
+      '<span class="lvl-node">' + (isCleared ? '✓' : (i + 1)) + '</span>' +
+      '<span class="lvl-meta">' +
+        '<span class="lvl-role">' + lv.role.toUpperCase().replace('·','/') + '</span>' +
+        '<div class="lvl-title">' + lv.title + '</div>' +
+      '</span>' +
+      '<span class="lvl-best">' + (state.best[i] !== null ? state.best[i] + '/8' : (locked ? 'LOCKED' : '—')) + '</span>';
+    if (!locked) row.addEventListener('click', () => { state.selected = i; renderMap(); });
+    ladder.appendChild(row);
+  });
+
+  const SL = LEVELS[state.selected];
+  const selLocked = state.selected + 1 > state.unlocked;
+  $('selNum').textContent = String(state.selected + 1).padStart(2, '0');
+  $('selRole').textContent = SL.role.toUpperCase();
+  $('selTitle').textContent = SL.title;
+  $('selDesc').textContent = SL.desc;
+  $('selBest').textContent = (state.best[state.selected] !== null ? state.best[state.selected] : '—') + ' / 8';
+  $('selBadge').textContent = SL.badge;
+
+  const diffColor = SL.diff >= 6 ? 'var(--red)' : SL.diff >= 4 ? 'var(--amber)' : 'var(--green)';
+  const bar = $('selDiff');
+  bar.innerHTML = '';
+  for (let d = 0; d < 6; d++) {
+    const seg = document.createElement('span');
+    if (d < SL.diff) seg.style.background = diffColor;
+    bar.appendChild(seg);
+  }
+  $('lockedNote').style.display = selLocked ? 'block' : 'none';
+  $('startBtn').style.display = selLocked ? 'none' : 'block';
+}
+
+$('startBtn').addEventListener('click', () => startLevel(state.selected));
+
+/* ---------- quiz ---------- */
+function shuffle4() {
+  const o = [0,1,2,3];
+  for (let k = 3; k > 0; k--) { const j = Math.floor(Math.random() * (k + 1)); [o[k], o[j]] = [o[j], o[k]]; }
+  return o;
+}
+
+function startLevel(i) {
+  state.cur = { level:i, idx:0, correct:0 };
+  state.answered = false;
+  state.order = shuffle4();
+  show('quiz');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const lv = LEVELS[state.cur.level];
+  const Q = lv.questions[state.cur.idx];
+  $('quizRole').textContent = lv.role.toUpperCase();
+  $('quizTitle').textContent = lv.title;
+  $('quizCount').textContent = 'Q ' + (state.cur.idx + 1) + ' / 8  ·  ✓ ' + state.cur.correct;
+  $('scenarioTag').classList.toggle('show', !!Q.scenario);
+  $('qText').textContent = Q.q;
+
+  const segs = $('segments');
+  segs.innerHTML = '';
+  for (let k = 0; k < 8; k++) {
+    const s = document.createElement('span');
+    if (k < state.cur.idx) s.className = 'done';
+    else if (k === state.cur.idx) s.className = 'cur' + (state.answered ? ' answered' : '');
+    segs.appendChild(s);
+  }
+
+  const box = $('optBox');
+  box.innerHTML = '';
+  state.order.forEach((optIdx, k) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'opt';
+    b.dataset.opt = optIdx;
+    b.innerHTML = '<span class="key">' + 'ABCD'[k] + '</span><span class="txt"></span>';
+    b.querySelector('.txt').textContent = Q.opts[optIdx];
+    b.addEventListener('click', () => pick(optIdx, Q));
+    box.appendChild(b);
+  });
+
+  $('explainBox').classList.remove('show');
+  $('nextBtn').classList.remove('show');
+}
+
+function pick(optIdx, Q) {
+  if (state.answered) return;
+  state.answered = true;
+  const ok = optIdx === Q.a;
+  if (ok) {
+    state.cur.correct++;
+    state.totalScore += 10 * LEVELS[state.cur.level].diff;
+    $('totalScore').textContent = state.totalScore;
+  }
+  document.querySelectorAll('.opt').forEach(o => {
+    o.disabled = true;
+    const idx = Number(o.dataset.opt);
+    if (idx === Q.a) o.classList.add('correct');
+    else if (idx === optIdx) o.classList.add('wrong');
+    else o.classList.add('faded');
+  });
+  const v = $('verdict');
+  v.textContent = ok ? '✓ CORRECT' : '✗ NOT QUITE';
+  v.className = 'verdict ' + (ok ? 'ok' : 'bad');
+  $('whyText').textContent = Q.why;
+  $('explainBox').classList.add('show');
+  $('quizCount').textContent = 'Q ' + (state.cur.idx + 1) + ' / 8  ·  ✓ ' + state.cur.correct;
+  const segs = $('segments').children;
+  segs[state.cur.idx].className = 'cur answered';
+  const nb = $('nextBtn');
+  nb.textContent = state.cur.idx + 1 >= 8 ? 'SEE DEBRIEF ▸' : 'NEXT ▸';
+  nb.classList.add('show');
+  persist();
+}
+
+$('nextBtn').addEventListener('click', () => {
+  if (state.cur.idx + 1 >= 8) return finishLevel();
+  state.cur.idx++;
+  state.answered = false;
+  state.order = shuffle4();
+  renderQuestion();
+});
+
+$('quitBtn').addEventListener('click', () => { renderMap(); show('map'); });
+
+/* ---------- results ---------- */
+function finishLevel() {
+  const i = state.cur.level;
+  const lv = LEVELS[i];
+  const score = state.cur.correct;
+  const passed = score >= PASS;
+
+  if (state.best[i] === null || score > state.best[i]) state.best[i] = score;
+  if (passed) state.unlocked = Math.max(state.unlocked, Math.min(i + 2, 6));
+  persist();
+
+  const allDone = state.best.every(b => b !== null && b >= PASS);
+  const rs = $('resScore');
+  rs.textContent = score + ' / 8';
+  rs.className = 'res-score ' + (passed ? 'pass' : 'fail');
+  $('resTitle').textContent = allDone ? 'OT Cyber Professional' : passed ? lv.badge + ' badge earned' : 'Almost there';
+  $('resMsg').textContent = allDone
+    ? 'You have climbed the whole ladder — from plant-floor basics to expert incident judgment. Retry any level to push your score higher.'
+    : passed
+      ? (i + 1 < 6 ? 'The next level is now unlocked: ' + LEVELS[i + 1].title + '.' : 'Top of the ladder reached.')
+      : 'You need ' + PASS + '/8 to advance. Read the explanations and run it again — repetition is how this sticks.';
+
+  const row = $('badgeRow');
+  row.innerHTML = '';
+  LEVELS.forEach((l, k) => {
+    if (state.best[k] !== null && state.best[k] >= PASS) {
+      const b = document.createElement('span');
+      b.className = 'badge';
+      b.textContent = l.badge.toUpperCase();
+      row.appendChild(b);
+    }
+  });
+  show('result');
+}
+
+$('retryBtn').addEventListener('click', () => startLevel(state.cur.level));
+$('backBtn').addEventListener('click', () => {
+  state.selected = Math.min(state.unlocked - 1, 5);
+  renderMap();
+  show('map');
+});
+
+renderMap();
+</script>
+</body>
+</html>
