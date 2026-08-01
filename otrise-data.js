@@ -75,3 +75,149 @@ window.OTRISE_LEVELS = [
     { q:"Scenario: The board asks, 'Are we secure now?' after a big OT security investment. The most honest expert answer is…", opts:["\"We've reduced specific risks measurably; here's what an attacker would still have to defeat, what we'd detect, and how the process stays safe if they succeed\"","\"Yes, 100% secure, forever\"","\"No idea, but the auditors were happy\"","\"Security is done; we can disband the team\""], a:0, why:"Expert maturity is speaking in residual risk: which scenarios are now bounded, what detection and response cover, and how safety is preserved under compromise — not absolute promises no honest engineer can make.", scenario:true }
   ]}
 ];
+
+// ---------------------------------------------------------------------------
+// IEC 62443 module — product certification guidance for 62443-4-1 and 62443-4-2.
+// 4-1 clauses (8 practices, 47 requirements) are presented per Maturity Level (ML 1-4).
+// 4-2 requirements (7 FRs, CR + EDR/HDR/NDR/SAR sets) are presented per Security Level (SL-C 1-4).
+// Summarized guidance for training — the normative text is the IEC standard itself.
+// ---------------------------------------------------------------------------
+window.OTRISE_IEC62443 = {
+  kicker: "// IEC 62443 — PRODUCT CERTIFICATION GUIDANCE",
+  title: "Certify the process. Certify the product.",
+  intro: "Two parts of IEC 62443 carry product certification. IEC 62443-4-1 certifies how you develop — a secure development lifecycle of 47 requirements in 8 practices, graded by Maturity Level (ML 1–4). IEC 62443-4-2 certifies what you ship — the security capability of the component itself, graded by Capability Security Level (SL-C 1–4). They are deliberately coupled: no scheme certifies a component under 4-2 without a conformant 4-1 process behind it. ISASecure CSA requires the supplier's SDLA process certificate; IECEE CB certificates bundle a 4-1 audit the same way.",
+  p41: {
+    tab: "62443-4-1 · PROCESS — BY MATURITY LEVEL",
+    heading: "IEC 62443-4-1 — Secure product development lifecycle",
+    sub: "Eight practices, 47 requirements. The certificate states the Maturity Level your organization demonstrates — pick a level to see what every practice must look like at that ML, and what an auditor expects as evidence.",
+    levels: [
+      { name: "ML 1 — Initial", desc: "Product development is ad hoc and largely undocumented. Security work happens when a motivated individual makes it happen, so results vary from product to product and are hard to repeat.", cert: "Not certifiable — no scheme issues a 62443-4-1 certificate at ML 1. Use it only as a gap-assessment baseline." },
+      { name: "ML 2 — Managed", desc: "Every practice is backed by a written, repeatable process. People are trained, roles are assigned, and the organization can show it is capable of executing the SDL — even if execution evidence across all products is still building up.", cert: "The certification entry point: ISASecure SDLA and IECEE CB certificates start at ML 2. For a first-time certification, ML 2 across all eight practices is the standard target." },
+      { name: "ML 3 — Defined (Practiced)", desc: "The documented SDL is demonstrably practiced across the whole organization. Auditors see execution evidence for real products — records, review minutes, test artifacts — not just procedures on paper.", cert: "The credibility level experienced buyers ask about: it proves the process runs in practice, product after product, not only in the quality manual." },
+      { name: "ML 4 — Improving", desc: "The SDL is measured. Metrics from all eight practices — defect escape rates, fix latency, test coverage — are collected, analyzed, and demonstrably drive continuous improvement of the process itself.", cert: "Rare in the market. An ML 4 certificate signals a mature, self-correcting product security organization — a differentiator, not a floor." }
+    ],
+    practices: [
+      { id: "SM", clause: "Practice 1 · SM-1…SM-13", name: "Security management", desc: "The umbrella practice: SDL scoping, personnel expertise, protection of the development environment and toolchain, control of third-party components, and periodic review of the process itself.",
+        ml: [
+          "Some security activities exist, but they depend on individuals and nothing is formally written down or repeatable.",
+          "A documented SDL exists with assigned roles, trained staff, a protected build environment, and a defined process for third-party and open-source components.",
+          "The SDL demonstrably governs every product team — audits show consistent execution, including supplier control, toolchain integrity, and periodic process reviews with records.",
+          "SDL performance is measured (e.g. defect escape rate, time-to-fix) and the metrics demonstrably drive changes to the process and its tooling." ] },
+      { id: "SR", clause: "Practice 2 · SR-1…SR-5", name: "Specification of security requirements", desc: "Define the product's security context and intended environment, build and maintain a threat model, and derive traceable security requirements from it.",
+        ml: [
+          "Security requirements appear informally, if at all, and are rarely revisited after the project starts.",
+          "A written procedure produces a security context, a threat model, and reviewed security requirements for the product.",
+          "Every product has a maintained, current threat model with requirements traceable through design and test, re-reviewed on significant change.",
+          "Threat-modeling effectiveness is measured (e.g. threats discovered late vs. early) and the method itself is tuned from the data." ] },
+      { id: "SD", clause: "Practice 3 · SD-1…SD-4", name: "Secure by design", desc: "Defense in depth, attack-surface reduction, analysis of all trust boundaries and interfaces, and documented secure-design best practices.",
+        ml: [
+          "Design security relies on the instincts of whoever architects the product.",
+          "A documented design process requires layered defenses, interface and trust-boundary analysis, and security design reviews.",
+          "Security design reviews with defined criteria are evidenced for all products, and the best-practice catalog is applied organization-wide and kept current.",
+          "Design-review findings feed metrics that measurably refine the secure-design guidance itself." ] },
+      { id: "SI", clause: "Practice 4 · SI-1…SI-2", name: "Secure implementation", desc: "Secure coding standards for every language and platform in the product, enforced through code review and static analysis.",
+        ml: [
+          "Coding style and security checks vary by developer; findings are handled informally.",
+          "Secure coding standards exist and static analysis / security code review are defined steps in the build process.",
+          "Enforcement is evidenced across all teams and products; deviations are documented, risk-assessed and approved.",
+          "Rule-violation and defect-density trends are tracked and drive updates to standards, training and tooling." ] },
+      { id: "SVV", clause: "Practice 5 · SVV-1…SVV-5", name: "Security verification & validation", desc: "Test that security requirements are met and threats are mitigated: requirements testing, vulnerability scanning, fuzzing and penetration testing, with defined tester independence.",
+        ml: [
+          "Testing is essentially functional; security testing happens occasionally and unsystematically.",
+          "A documented security test plan covers requirements testing, abuse cases, known-vulnerability scanning and fuzz/penetration testing, with independence rules.",
+          "Security test evidence exists for each release of each product, executed with the required degree of tester independence.",
+          "Escape analysis — issues found in the field versus in test — is used to tune test depth, tooling and coverage." ] },
+      { id: "DM", clause: "Practice 6 · DM-1…DM-6", name: "Management of security-related issues", desc: "Receive security issues from internal and external reporters, triage and rate them, perform root-cause analysis, resolve them, and disclose responsibly.",
+        ml: [
+          "Vulnerabilities are handled ad hoc, when and if someone notices them.",
+          "A documented intake exists — including a public reporting channel — with defined impact rating (e.g. CVSS), tracking and a disclosure process.",
+          "Handling timelines, root-cause analysis and periodic issue review are evidenced across the whole product portfolio.",
+          "Issue metrics such as time-to-fix and recurrence rate drive systemic corrections to development practice." ] },
+      { id: "SUM", clause: "Practice 7 · SUM-1…SUM-5", name: "Security update management", desc: "Deliver security patches that are verified, documented and timely — and keep users informed, including about updates to third-party components underneath the product.",
+        ml: [
+          "Patches ship irregularly, with little verification or documentation.",
+          "A documented update process delivers verified patches with release notes over an integrity-protected channel.",
+          "Update delivery, compatibility testing and user notification are evidenced product-by-product, release after release.",
+          "Patch latency is measured from disclosure to availability and demonstrably shortened over time." ] },
+      { id: "SG", clause: "Practice 8 · SG-1…SG-7", name: "Security guidelines", desc: "Ship the documentation that lets an asset owner deploy the product securely: hardening guides, secure defaults, account handling, and secure decommissioning.",
+        ml: [
+          "Security documentation is thin, outdated, or missing entirely.",
+          "A documented process produces hardening guidance, defense-in-depth expectations for the environment, and account/credential guidance for every product.",
+          "Every shipped product has current, review-evidenced security guidelines, updated with the product itself.",
+          "Support cases and field feedback are analyzed and measurably improve the guidance." ] }
+    ]
+  },
+  p42: {
+    tab: "62443-4-2 · COMPONENT — BY SECURITY LEVEL",
+    heading: "IEC 62443-4-2 — Technical security requirements for components",
+    sub: "Seven Foundational Requirements (FRs) containing Component Requirements (CRs) plus device-specific sets (EDR/HDR/NDR/SAR). The certificate states the Capability Security Level, SL-C 1–4: higher levels switch on Requirement Enhancements (REs). Pick a target SL-C to see what each FR demands.",
+    levels: [
+      { name: "SL-C 1", desc: "Protection against casual or coincidental violation — honest mistakes, curious employees, misconfiguration.", cert: "Base CRs only, no REs. Rarely worth certifying on its own today; treat it as the floor you pass through." },
+      { name: "SL-C 2", desc: "Protection against intentional violation using simple means: low resources, generic (IT-grade) skills, low motivation.", cert: "The de-facto market minimum for new components — and the level most CRA- and NIS2-driven buyers will ask for as evidence. First REs switch on: unique identities, RBAC, signed updates, protected audit trails." },
+      { name: "SL-C 3", desc: "Protection against intentional violation using sophisticated means: moderate resources, IACS-specific skills, moderate motivation.", cert: "Demands substantial RE coverage plus hardware-anchored security on devices (roots of trust, boot-chain authenticity, tamper detection, MFA). The first SL 3 component certificates were only issued in 2024 — expect real engineering effort." },
+      { name: "SL-C 4", desc: "Protection against intentional violation using sophisticated means with extended resources: IACS-specific skills and high motivation — state-level adversaries.", cert: "Near-total RE coverage with the strongest assurances (hardware-protected credentials, non-repudiation for all users, tamper response). Very rare in the market; specify it only where the threat model truly justifies it." }
+    ],
+    frs: [
+      { id: "FR 1", clause: "IAC · CR 1.1–1.14", name: "Identification & authentication control", desc: "Identify and authenticate every human user, software process and device before granting any access.",
+        sl: [
+          "Identify and authenticate human users; basic password capability and key/certificate handling where used.",
+          "Adds unique accounts (no shared identities), identification and authentication of software processes and devices, and managed identifiers, authenticators and password strength.",
+          "Adds multifactor authentication for human access and hardened protection of authenticators and credential stores.",
+          "Strongest identity assurance on all interfaces, including hardware-protected credentials." ] },
+      { id: "FR 2", clause: "UC · CR 2.1–2.13", name: "Use control", desc: "Enforce authorization on every interface, control wireless, mobile code and sessions, and record what happens in a defensible audit trail.",
+        sl: [
+          "Enforce assigned authorizations on all interfaces and generate audit records for security-relevant events.",
+          "Adds per-role authorization mapping for users, processes and devices, mobile-code and session controls, audit-record protection, and control of physical diagnostic and test interfaces.",
+          "Adds non-repudiation for human actions, supervisor-override discipline, and active monitoring of diagnostic interfaces.",
+          "Extends non-repudiation to all users and processes with the strongest audit-chain assurance." ] },
+      { id: "FR 3", clause: "SI · CR 3.1–3.9 + EDR/HDR/NDR 3.10–3.14", name: "System integrity", desc: "Protect the integrity of communications and sessions — and of the device itself, from firmware to boot chain. This is where the device-specific EDR/HDR/NDR requirements live.",
+        sl: [
+          "Integrity-protect communications, validate inputs, produce deterministic output, verify security functions, and report malicious-code protection status.",
+          "Adds cryptographic session integrity, authenticity of software updates before installation, and the device-specific set: security update support and boot-process integrity.",
+          "Adds hardware roots of trust (supplier- and asset-owner-provisioned), authenticity of the full boot chain, and physical tamper resistance and detection.",
+          "Adds tamper response beyond detection and the strongest integrity assurance across all functions." ] },
+      { id: "FR 4", clause: "DC · CR 4.1–4.3", name: "Data confidentiality", desc: "Protect designated sensitive information — credentials, keys, recipes, configuration — at rest and in transit, using vetted cryptography.",
+        sl: [
+          "Confidentiality of sensitive data in transit and at rest, using standard, vetted cryptographic mechanisms.",
+          "Adds purging of sensitive data remnants — information must not survive decommissioning or resource release in readable form.",
+          "Adds verification of erasure and hardened cryptographic key storage.",
+          "As SL 3, with hardware-backed key protection expected in practice — FR 4 differentiates early; assurance depth carries the rest." ] },
+      { id: "FR 5", clause: "RDF · CR 5.1 + NDR 5.2–5.3", name: "Restricted data flow", desc: "Support the zones-and-conduits architecture: components must be segmentable, and network devices must enforce the boundary.",
+        sl: [
+          "Support network segmentation — interfaces can be separated and the component does not silently bridge networks.",
+          "Network devices enforce zone-boundary policy and can deny traffic by default.",
+          "Adds island mode and fail-close behavior at the boundary when under attack.",
+          "Same mechanisms at the strongest assurance level." ] },
+      { id: "FR 6", clause: "TRE · CR 6.1–6.2", name: "Timely response to events", desc: "Make evidence available and support the plant's continuous monitoring — a component that cannot be monitored cannot be defended.",
+        sl: [
+          "Audit logs are accessible on demand for incident handling.",
+          "Adds programmatic, machine-readable access to audit logs and support for continuous monitoring using commonly accepted security industry practices.",
+          "Adds support for near-real-time indication of potential breaches.",
+          "Same capabilities at the strongest assurance level." ] },
+      { id: "FR 7", clause: "RA · CR 7.1–7.8", name: "Resource availability", desc: "Stay available under attack: degrade gracefully, never become the reason the process stops, and support backup and recovery.",
+        sl: [
+          "Operate at degraded capacity during DoS conditions, manage resource exhaustion, support backup and restore, and apply least functionality.",
+          "Adds load management, backup integrity verification, recovery to a known secure state, and reporting of the component's security settings inventory.",
+          "Adds limiting DoS effects so an attacked component cannot drag down other systems or zones.",
+          "Same mechanisms at the strongest assurance level." ] }
+    ],
+    components: [
+      { id: "SAR", name: "Software application", note: "Application running on a host you don't control. Certified per application; mobile-code and integrity requirements apply in SAR form." },
+      { id: "EDR", name: "Embedded device", note: "Special-purpose device running firmware — PLC, RTU, safety controller. Carries the heaviest device set: EDR 3.10–3.14 (updates, tamper, roots of trust, boot integrity)." },
+      { id: "HDR", name: "Host device", note: "General-purpose OS platform hosting applications — HMI server, historian, engineering workstation image. HDR 3.10–3.14 variants apply." },
+      { id: "NDR", name: "Network device", note: "Switch, router, firewall, gateway. Adds NDR 5.2–5.3: zone-boundary enforcement and restriction of person-to-person communications." }
+    ]
+  },
+  cert: {
+    heading: "THE CERTIFICATION PATH — 4-1 AND 4-2 TOGETHER",
+    steps: [
+      "Fix the target: pick the component type (SAR / EDR / HDR / NDR) and a target SL-C from the markets you sell into. SL-C 2 is today's practical floor; SL-C 3 where the component sits at an exposed or safety-relevant position.",
+      "Get the process certified first: 4-2 presupposes a conformant 4-1 SDL. Aim for ML 2 as the certification entry point, ML 3 to be credible — ISASecure CSA formally requires the supplier's SDLA certificate.",
+      "Gap-assess the product against every applicable CR and RE for the target SL-C — including the device-specific EDR/HDR/NDR/SAR sets, which is where embedded products usually find their hardest gaps (roots of trust, boot integrity, tamper).",
+      "Close the gaps in design, then build the evidence package: security context and threat model (SR), test reports including robustness/fuzz testing (SVV), defect and update records (DM/SUM), and the hardening guide (SG).",
+      "Certify with an accredited scheme: ISASecure CSA (components) or ICSA (IIoT components), or an IECEE CB certificate issued via a certification body such as exida, TÜV SÜD, TÜV Rheinland, UL Solutions or SGS.",
+      "Keep it alive: certificates reference exact versions — surveillance audits, patch obligations under SUM, and re-assessment on significant change are part of the deal, not an afterthought."
+    ],
+    note: "Why now: certified 62443-4-1/4-2 conformance is the strongest available evidence toward the EU Cyber Resilience Act's essential requirements (reporting obligations start 11 Sep 2026) and feeds NIS2 supply-chain expectations. This page is summarized training guidance — the normative text is the IEC standard itself."
+  }
+};

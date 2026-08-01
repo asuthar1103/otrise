@@ -148,7 +148,7 @@
         <div id="pillar-c" data-reveal="160" style="background:#14161a;border:1px solid #23262b;border-radius:12px;padding:20px 20px 18px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s" style-hover="border-color:#7a5a24">
           <div style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:#8f939b">PILLAR C</div>
           <div style="font-size:15px;font-weight:700">IEC 62443 Workbench</div>
-          <div style="color:#b6bac1;font-size:13px;line-height:1.6;flex:1">Guided gap assessments, zones &amp; conduits modeling, and audit-ready reports.</div>
+          <div style="color:#b6bac1;font-size:13px;line-height:1.6;flex:1">Guided gap assessments, zones &amp; conduits modeling, and audit-ready reports. Until it ships: our free <button onClick="{{ nav.workbench }}" style="background:none;border:none;padding:0;cursor:pointer;font:inherit;color:#ffa62b" style-hover="color:#ffc46e">4-1 / 4-2 certification guidance ▸</button></div>
           <div style="align-self:flex-start;font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:1.5px;color:#3ddc97;border:1px solid rgba(61,220,151,0.4);border-radius:4px;padding:3px 9px">FIRST RELEASE</div>
         </div>
         <div id="pillar-d" data-reveal="0" style="background:#14161a;border:1px solid #23262b;border-radius:12px;padding:20px 20px 18px;display:flex;flex-direction:column;gap:8px;transition:border-color .15s" style-hover="border-color:#7a5a24">
@@ -183,6 +183,102 @@
         <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:#5c6067;line-height:1.7">NO AGENTS. NO SCANNERS. NO OT CONNECTIVITY.<br>EARLY PARTNERS SHAPE THE ROADMAP &amp; LOCK IN FOUNDING PRICING.</div>
       </div>
     </section>
+  </main>
+  </sc-if>
+
+  <sc-if value="{{ isIEC }}" hint-placeholder-val="{{ false }}">
+  <main style="flex:1;width:100%;max-width:1160px;margin:0 auto;padding:36px clamp(20px,4vw,44px) 56px" data-screen-label="IEC 62443 certification guidance">
+    <div style="animation:fadeUp .4s ease both">
+      <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:2px;color:#ffa62b">{{ iecKicker }}</div>
+      <h1 style="font-size:clamp(26px,3.8vw,40px);font-weight:800;letter-spacing:-0.5px;margin:14px 0 12px">{{ iecTitle }}</h1>
+      <p style="color:#b6bac1;font-size:15px;line-height:1.7;max-width:880px;margin-bottom:26px">{{ iecIntro }}</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:26px">
+        <button onClick="{{ iecTo41 }}" style="border:1px solid {{ tab41Border }};background:{{ tab41Bg }};color:{{ tab41Color }};border-radius:8px;padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:border-color .12s,color .12s">{{ tab41Label }}</button>
+        <button onClick="{{ iecTo42 }}" style="border:1px solid {{ tab42Border }};background:{{ tab42Bg }};color:{{ tab42Color }};border-radius:8px;padding:11px 18px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:border-color .12s,color .12s">{{ tab42Label }}</button>
+      </div>
+
+      <sc-if value="{{ iecShow41 }}" hint-placeholder-val="{{ true }}">
+        <h2 style="font-size:21px;font-weight:700;margin-bottom:8px">{{ p41Heading }}</h2>
+        <p style="color:#b6bac1;font-size:14px;line-height:1.65;max-width:860px;margin-bottom:18px">{{ p41Sub }}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <sc-for list="{{ mlChips }}" as="ch" hint-placeholder-count="4">
+            <button onClick="{{ ch.onPick }}" style="border:1px solid {{ ch.border }};background:{{ ch.bg }};color:{{ ch.color }};border-radius:16px;padding:9px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:border-color .12s,color .12s">{{ ch.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#14161a;border:1px solid #7a5a24;border-radius:12px;padding:20px 22px;margin-bottom:22px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#ffa62b;margin-bottom:8px">{{ mlName }}</div>
+          <p style="color:#c4c8cf;font-size:14px;line-height:1.65;margin-bottom:10px">{{ mlDesc }}</p>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;color:#3ddc97"><span style="letter-spacing:2px">CERTIFICATION ▸</span> {{ mlCert }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px">
+          <sc-for list="{{ practices41 }}" as="pr" hint-placeholder-count="8">
+            <div style="background:#14161a;border:1px solid #23262b;border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s" style-hover="border-color:#7a5a24">
+              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#1a1004;background:#ffa62b;border-radius:4px;padding:3px 9px">{{ pr.id }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#8f939b">{{ pr.clause }}</span>
+              </div>
+              <div style="font-size:15px;font-weight:700;margin:10px 0 6px">{{ pr.name }}</div>
+              <p style="color:#b6bac1;font-size:13px;line-height:1.6;flex:1">{{ pr.desc }}</p>
+              <div style="margin-top:12px;border-top:1px solid #23262b;padding-top:10px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:#ffa62b">AT {{ mlShort }}</span>
+                <p style="color:#c4c8cf;font-size:13px;line-height:1.6;margin-top:5px">{{ pr.mlText }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <sc-if value="{{ iecShow42 }}" hint-placeholder-val="{{ false }}">
+        <h2 style="font-size:21px;font-weight:700;margin-bottom:8px">{{ p42Heading }}</h2>
+        <p style="color:#b6bac1;font-size:14px;line-height:1.65;max-width:860px;margin-bottom:18px">{{ p42Sub }}</p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px">
+          <sc-for list="{{ slChips }}" as="ch" hint-placeholder-count="4">
+            <button onClick="{{ ch.onPick }}" style="border:1px solid {{ ch.border }};background:{{ ch.bg }};color:{{ ch.color }};border-radius:16px;padding:9px 20px;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:1px;cursor:pointer;transition:border-color .12s,color .12s">{{ ch.label }}</button>
+          </sc-for>
+        </div>
+        <div style="background:#14161a;border:1px solid #7a5a24;border-radius:12px;padding:20px 22px;margin-bottom:22px">
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:700;letter-spacing:2px;color:#ffa62b;margin-bottom:8px">{{ slName }}</div>
+          <p style="color:#c4c8cf;font-size:14px;line-height:1.65;margin-bottom:10px">{{ slDesc }}</p>
+          <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;line-height:1.7;color:#3ddc97"><span style="letter-spacing:2px">CERTIFICATION ▸</span> {{ slCert }}</div>
+        </div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px;margin-bottom:26px">
+          <sc-for list="{{ frs42 }}" as="fr" hint-placeholder-count="7">
+            <div style="background:#14161a;border:1px solid #23262b;border-radius:12px;padding:18px;display:flex;flex-direction:column;transition:border-color .15s" style-hover="border-color:#7a5a24">
+              <div style="display:flex;align-items:baseline;gap:10px;flex-wrap:wrap">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:700;letter-spacing:1px;color:#1a1004;background:#ffa62b;border-radius:4px;padding:3px 9px">{{ fr.id }}</span>
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:1px;color:#8f939b">{{ fr.clause }}</span>
+              </div>
+              <div style="font-size:15px;font-weight:700;margin:10px 0 6px">{{ fr.name }}</div>
+              <p style="color:#b6bac1;font-size:13px;line-height:1.6;flex:1">{{ fr.desc }}</p>
+              <div style="margin-top:12px;border-top:1px solid #23262b;padding-top:10px">
+                <span style="font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:2px;color:#ffa62b">AT {{ slShort }}</span>
+                <p style="color:#c4c8cf;font-size:13px;line-height:1.6;margin-top:5px">{{ fr.slText }}</p>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#8f939b;margin-bottom:12px">ONE CERTIFICATE PER COMPONENT TYPE</div>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px">
+          <sc-for list="{{ comps42 }}" as="cp" hint-placeholder-count="4">
+            <div style="background:#14161a;border:1px solid #23262b;border-left:2px solid #ffa62b;border-radius:0 12px 12px 0;padding:16px 18px">
+              <div style="font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;letter-spacing:2px;color:#ffa62b">{{ cp.id }} — {{ cp.name }}</div>
+              <p style="font-size:13px;line-height:1.6;color:#b6bac1;margin-top:8px">{{ cp.note }}</p>
+            </div>
+          </sc-for>
+        </div>
+      </sc-if>
+
+      <div style="background:#14161a;border:1px solid #23262b;border-radius:12px;padding:22px;margin-top:28px">
+        <div style="font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:#8f939b;margin-bottom:6px">{{ certHeading }}</div>
+        <sc-for list="{{ certSteps }}" as="st" hint-placeholder-count="6">
+          <div style="display:flex;gap:14px;align-items:flex-start;margin-top:14px">
+            <span style="width:26px;height:26px;flex-shrink:0;display:grid;place-items:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:700;color:#ffa62b;border:1px solid #7a5a24;border-radius:50%">{{ st.n }}</span>
+            <p style="color:#c4c8cf;font-size:14px;line-height:1.65">{{ st.txt }}</p>
+          </div>
+        </sc-for>
+        <p style="color:#8f939b;font-size:12px;line-height:1.7;margin-top:18px;border-top:1px solid #23262b;padding-top:14px">{{ certNote }}</p>
+      </div>
+    </div>
   </main>
   </sc-if>
 
@@ -310,7 +406,8 @@ class Component extends DCLogic {
       screen: 'landing', selected: 0, unlocked: 1,
       best: [null, null, null, null, null, null], totalScore: 0,
       cur: { level: 0, idx: 0, correct: 0 }, answered: false, picked: null,
-      order: [0, 1, 2, 3], typed: ''
+      order: [0, 1, 2, 3], typed: '',
+      iecTab: '41', iecML: 2, iecSL: 2
     };
     if (saved) {
       this.state.unlocked = Math.min(Math.max(saved.unlocked || 1, 1), 6);
@@ -476,9 +573,44 @@ class Component extends DCLogic {
     const badges = L.filter((l, k) => s.best[k] !== null && s.best[k] >= PASS)
       .map((l, k) => ({ name: l.badge.toUpperCase(), delay: (0.15 + k * 0.08) + 's' }));
 
+    const iec = window.OTRISE_IEC62443 || null;
+    let iecVals = {};
+    if (iec) {
+      const is41 = s.iecTab !== '42';
+      const mlSel = iec.p41.levels[s.iecML - 1] || iec.p41.levels[0];
+      const slSel = iec.p42.levels[s.iecSL - 1] || iec.p42.levels[0];
+      const chip = (on) => ({
+        border: on ? '#ffa62b' : '#34383f',
+        bg: on ? 'rgba(255,166,43,0.10)' : '#14161a',
+        color: on ? '#ffa62b' : '#8f939b'
+      });
+      iecVals = {
+        iecKicker: iec.kicker, iecTitle: iec.title, iecIntro: iec.intro,
+        iecShow41: is41, iecShow42: !is41,
+        iecTo41: () => this.setState({ iecTab: '41' }),
+        iecTo42: () => this.setState({ iecTab: '42' }),
+        tab41Label: iec.p41.tab, tab42Label: iec.p42.tab,
+        tab41Border: is41 ? '#ffa62b' : '#34383f', tab41Bg: is41 ? 'rgba(255,166,43,0.10)' : 'transparent', tab41Color: is41 ? '#ffa62b' : '#8f939b',
+        tab42Border: !is41 ? '#ffa62b' : '#34383f', tab42Bg: !is41 ? 'rgba(255,166,43,0.10)' : 'transparent', tab42Color: !is41 ? '#ffa62b' : '#8f939b',
+        p41Heading: iec.p41.heading, p41Sub: iec.p41.sub,
+        p42Heading: iec.p42.heading, p42Sub: iec.p42.sub,
+        mlChips: [1, 2, 3, 4].map(n => ({ label: 'ML ' + n, ...chip(n === s.iecML), onPick: () => this.setState({ iecML: n }) })),
+        mlName: mlSel.name, mlDesc: mlSel.desc, mlCert: mlSel.cert, mlShort: 'ML ' + s.iecML,
+        practices41: iec.p41.practices.map(p => ({ id: p.id, clause: p.clause, name: p.name, desc: p.desc, mlText: p.ml[s.iecML - 1] })),
+        slChips: [1, 2, 3, 4].map(n => ({ label: 'SL-C ' + n, ...chip(n === s.iecSL), onPick: () => this.setState({ iecSL: n }) })),
+        slName: slSel.name, slDesc: slSel.desc, slCert: slSel.cert, slShort: 'SL-C ' + s.iecSL,
+        frs42: iec.p42.frs.map(f => ({ id: f.id, clause: f.clause, name: f.name, desc: f.desc, slText: f.sl[s.iecSL - 1] })),
+        comps42: iec.p42.components,
+        certHeading: iec.cert.heading,
+        certSteps: iec.cert.steps.map((t, n) => ({ n: String(n + 1), txt: t })),
+        certNote: iec.cert.note
+      };
+    }
+
     return {
       isLanding: s.screen === 'landing', isMap: s.screen === 'map',
       isQuiz: s.screen === 'quiz', isResult: s.screen === 'result',
+      isIEC: s.screen === 'iec62443',
       motionOn, scanlinesOn: this.props.scanlines ?? true,
       totalScore: s.totalScore, clearedCount: cleared,
       typedHead: s.typed,
@@ -502,7 +634,7 @@ class Component extends DCLogic {
         platform: () => this.goSection('platform'),
         academy: () => this.goSection('pillar-a'),
         obsolescence: () => this.goSection('pillar-b'),
-        workbench: () => this.goSection('pillar-c'),
+        workbench: () => this.go('iec62443'),
         regulatory: () => this.goSection('pillar-d'),
         risk: () => this.goSection('pillar-e'),
         advisory: () => this.goSection('pillar-f')
@@ -530,7 +662,8 @@ class Component extends DCLogic {
       resScore: score + ' / 8', resColor: passed ? '#3ddc97' : '#ffa62b',
       resTitle, resMsg, badges,
       retryLevel: () => this.startLevel(s.cur.level),
-      backToMap: () => { this.setState({ selected: Math.min(s.unlocked - 1, 5) }); this.go('map'); }
+      backToMap: () => { this.setState({ selected: Math.min(s.unlocked - 1, 5) }); this.go('map'); },
+      ...iecVals
     };
   }
 }
